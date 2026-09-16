@@ -75,6 +75,12 @@ TREATMENT_YEAR   = 2014   # mise en œuvre de la CCE
 PLACEBO_YEAR     = 2010   # faux traitement pour le placebo in-time
 PANEL_END        = 2023   # dernier millésime Eurostat disponible
 
+# Années exclues pour le contrôle de robustesse "sans choc COVID" du test de
+# permutation temporelle (time_permutation_pvalue). N'affecte ni l'estimation
+# principale ni le panel — sert uniquement à vérifier que la quasi-significativité
+# du test temporel ne repose pas seulement sur le creux de mobilité de 2020.
+COVID_EXCLUDED_YEARS = [2020]
+
 # ─────────────────────────────────────────────
 # PARAMÈTRES SCM
 # ─────────────────────────────────────────────
