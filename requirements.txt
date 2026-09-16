@@ -1,0 +1,9 @@
+# Dépendances du pipeline SCM — CCE 2014
+# Installer avec : pip install -r requirements.txt
+
+eurostat>=0.2.6
+pandas>=1.5.0
+numpy>=1.23.0
+scipy>=1.9.0
+matplotlib>=3.6.0
+openpyxl>=3.0.10    # lecture fichier Excel (Weekly Oil Bulletin)
