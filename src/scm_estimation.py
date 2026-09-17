@@ -35,7 +35,7 @@ from scipy.optimize import minimize
 from config import (
     TREATED_UNIT, TARGET_VAR, TREATMENT_YEAR, PLACEBO_YEAR,
     TRAIN_START, TRAIN_END, PANEL_END, MSPE_THRESHOLD, COVID_EXCLUDED_YEARS,
-    PAYS_CIBLES, MASTER_DATASET_PATH, FIGURES_DIR
+    PAYS_CIBLES, MASTER_DATASET_PATH, FIGURES_DIR, PREDICTOR_VARS
 )
 
 
@@ -96,6 +96,52 @@ def load_target_panel_full_pool(filepath, pays_cibles: list, target_var: str,
     return df_long.reset_index(drop=True)
 
 
+def load_predictor_augmented_data(filepath, pays_cibles: list, target_var: str,
+                                   predictor_vars: list, year_start: int,
+                                   year_end: int) -> tuple:
+    """Charge TARGET_VAR + PREDICTOR_VARS pour les candidats PAYS_CIBLES ayant
+    des données complètes sur toutes ces variables (un candidat totalement
+    dépourvu d'une variable, ex. la Grèce pour diesel_price_ht, est exclu du
+    pool avec un avertissement plutôt que silencieusement mis à zéro).
+
+    Retourne (data_by_var, valid_countries) où data_by_var[var] est un pivot
+    year × geo (log sauf nrg_ind_ren, interpolé par pays).
+    """
+    df_raw = pd.read_csv(filepath)
+    all_vars = [target_var] + predictor_vars
+
+    valid_countries = set(pays_cibles)
+    for var in all_vars:
+        present = set(df_raw.loc[df_raw['variable'] == var, 'geo'])
+        missing = valid_countries - present
+        if missing:
+            print(f"   [Prédicteurs] {var} absent pour {sorted(missing)} — "
+                  f"exclu(s) du pool candidat de la variante augmentée.")
+        valid_countries &= present
+    valid_countries = sorted(valid_countries)
+
+    data_by_var = {}
+    for var in all_vars:
+        sub = df_raw[
+            (df_raw['variable'] == var) & (df_raw['geo'].isin(valid_countries))
+        ].copy()
+        year_cols = [c for c in sub.columns
+                     if str(c).isdigit() and year_start <= int(c) <= year_end]
+        long = sub.melt(id_vars=['geo'], value_vars=year_cols,
+                         var_name='year', value_name=var)
+        long['year'] = long['year'].astype(int)
+        long.sort_values(['geo', 'year'], inplace=True)
+        long[var] = long.groupby('geo')[var].transform(
+            lambda x: x.interpolate(method='linear', limit_direction='both')
+        )
+        if var != 'nrg_ind_ren':
+            long.loc[long[var] <= 0, var] = 0.0001
+            long[var] = np.log(long[var])
+        data_by_var[var] = long.pivot(index='year', columns='geo', values=var)
+
+    return data_by_var, valid_countries
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # 2. OPTIMISATION SCM
 # ──────────────────────────────────────────────────────────────────────────────
@@ -112,6 +158,44 @@ def get_w(X: np.ndarray, y: np.ndarray) -> np.ndarray:
     res = minimize(loss_w, w_init, args=(X, y), method='SLSQP',
                    bounds=bounds, constraints=cons)
     return res.x
+
+
+def get_w_predictor_augmented(data_by_var: dict, treated_unit: str, donors: list,
+                               target_var: str, predictor_vars: list,
+                               pre_years) -> np.ndarray:
+    """Poids W ajustés sur la variable cible (une ligne par année
+    pré-traitement, comme get_w) ET sur des prédicteurs structurels (une
+    ligne par prédicteur = sa moyenne pré-traitement), à la manière d'ADH.
+
+    Simplification assumée par rapport à l'ADH complet : chaque bloc
+    (cible et chaque prédicteur) est standardisé (centré-réduit sur
+    traité+donneurs) avant d'être empilé, ce qui revient à donner à
+    chaque variable un poids d'importance V = 1/variance — la
+    recommandation par défaut de la littérature SCM quand la pondération V
+    n'est pas calibrée par optimisation imbriquée (nested optimization),
+    plutôt qu'une vraie estimation de V. Pas de biais de fuite : la
+    standardisation n'utilise que les années pré-traitement.
+    """
+    rows_X, rows_y = [], []
+
+    df_t = data_by_var[target_var]
+    sub_t = df_t.loc[df_t.index.isin(pre_years)]
+    all_units = [treated_unit] + donors
+    mu_t, sigma_t = sub_t[all_units].values.mean(), sub_t[all_units].values.std()
+    rows_X.append(((sub_t[donors] - mu_t) / sigma_t).values)
+    rows_y.append(((sub_t[treated_unit] - mu_t) / sigma_t).values)
+
+    for pred in predictor_vars:
+        df_p = data_by_var[pred]
+        sub_p = df_p.loc[df_p.index.isin(pre_years)]
+        pre_means = sub_p[all_units].mean(axis=0)
+        mu_p, sigma_p = pre_means.mean(), pre_means.std()
+        rows_X.append(((pre_means[donors] - mu_p) / sigma_p).values.reshape(1, -1))
+        rows_y.append(np.array([(pre_means[treated_unit] - mu_p) / sigma_p]))
+
+    X = np.vstack(rows_X)
+    y = np.concatenate(rows_y)
+    return get_w(X, y)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -183,6 +267,72 @@ def time_permutation_pvalue(gap: pd.Series, treatment_year: int,
         'p_value':         p_value,
         'n_permutations':  len(perm_ratios),
     }
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# 3ter. AUTRES CONTRÔLES DE ROBUSTESSE (checklist AGENTS.md §5)
+# ──────────────────────────────────────────────────────────────────────────────
+
+def leave_one_out_check(df_emissions: pd.DataFrame, control_units: list,
+                         treated_unit: str, treatment_year: int,
+                         donors_to_drop: list) -> dict:
+    """Robustesse leave-one-out : recalcule le contrôle synthétique de la
+    France en retirant tour à tour chaque donneur de `donors_to_drop` (les
+    donneurs à poids non nul), pour vérifier que le pré-fit et le gap ne
+    reposent pas sur un seul pays (cf. concentration DE=76.5%/IT=19.4%).
+
+    Ne recalcule pas la distribution de permutation par pays (ce qui
+    impliquerait de refaire tous les placebos sous le même pool restreint) —
+    seulement la stabilité du pré-fit et du gap propres à la France, plus la
+    p-valeur de permutation temporelle (indépendante du pool), qui elle reste
+    directement comparable d'une variante à l'autre.
+    """
+    mask_pre = df_emissions.index < treatment_year
+    out = {}
+    for dropped in donors_to_drop:
+        remaining = [c for c in control_units if c != dropped]
+        y_pre = df_emissions.loc[mask_pre, treated_unit].values
+        X_pre = df_emissions.loc[mask_pre, remaining].values
+        w = get_w(X_pre, y_pre)
+        synth = df_emissions[remaining].values @ w
+        pre_rmse_loo = float(np.sqrt(np.mean((y_pre - X_pre @ w) ** 2)))
+        gap_loo = pd.Series(
+            df_emissions[treated_unit].values - synth, index=df_emissions.index
+        )
+        avg_gap_post_loo = float(gap_loo[gap_loo.index >= treatment_year].mean())
+        tp_loo = time_permutation_pvalue(gap_loo, treatment_year)
+        out[dropped] = {
+            'weights':          {c: round(float(x), 3) for c, x in zip(remaining, w)},
+            'pre_rmse':         pre_rmse_loo,
+            'avg_gap_post':     avg_gap_post_loo,
+            'time_p_value':     tp_loo['p_value'],
+        }
+    return out
+
+
+def mspe_threshold_sensitivity(placebos_space: dict, mspe_pre_all: dict,
+                                treated_unit: str, treatment_year: int,
+                                years: pd.Index, thresholds=(2, 3, 5)) -> dict:
+    """Robustesse : rang et p-valeur (pays) de la France pour plusieurs
+    seuils de bande MSPE (checklist AGENTS.md §5 : "sensibilité au seuil
+    MSPE 2× vs 3× vs 5×"), sans relancer d'optimisation — réutilise les
+    pré/post-MSPE déjà calculés pour chaque unité.
+    """
+    post_mspe_all = {
+        u: calculate_mspe(g, treatment_year, years, 'post') for u, g in placebos_space.items()
+    }
+    fr_pre_mspe = mspe_pre_all[treated_unit]
+    out = {}
+    for thr in thresholds:
+        lo, hi = fr_pre_mspe / thr, fr_pre_mspe * thr
+        valid = [u for u, e in mspe_pre_all.items() if lo <= e <= hi]
+        ratios_t = {u: post_mspe_all[u] / mspe_pre_all[u] for u in valid if mspe_pre_all[u] > 0}
+        if treated_unit not in ratios_t:
+            out[thr] = {'n_valid': len(valid), 'rank': None, 'p_value': None}
+            continue
+        rank = sorted(ratios_t.values(), reverse=True).index(ratios_t[treated_unit]) + 1
+        out[thr] = {'n_valid': len(ratios_t), 'rank': rank, 'p_value': rank / len(ratios_t)}
+    return out
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -285,6 +435,27 @@ def run_scm(df_panel: pd.DataFrame) -> dict:
           f"p-valeur : {time_perm_no_covid['p_value']:.3f} "
           f"({time_perm_no_covid['n_permutations']} permutations)")
 
+    # ── Leave-one-out sur les donneurs à poids non nul ──
+    donors_with_weight = [c for c, w in zip(control_units, weights_fr) if w > 0.01]
+    loo = leave_one_out_check(
+        df_emissions, control_units, TREATED_UNIT, TREATMENT_YEAR, donors_with_weight
+    )
+    print(f"\n   Leave-one-out (donneurs à poids non nul : {donors_with_weight}) :")
+    for dropped, r in loo.items():
+        print(f"      sans {dropped} : RMSE pré = {r['pre_rmse']:.4f} | "
+              f"gap post moyen = {r['avg_gap_post']:.3f} | "
+              f"p-valeur temps = {r['time_p_value']:.3f} | poids = {r['weights']}")
+
+    # ── Sensibilité au seuil MSPE (checklist §5 : 2× vs 3× vs 5×) ──
+    mspe_sensitivity = mspe_threshold_sensitivity(
+        placebos_space, mspe_pre_all, TREATED_UNIT, TREATMENT_YEAR,
+        df_emissions.index, thresholds=(2, 3, 5)
+    )
+    print(f"\n   Sensibilité au seuil MSPE :")
+    for thr, r in mspe_sensitivity.items():
+        print(f"      ×{thr} : {r['n_valid']} unités valides | "
+              f"rang France = {r['rank']} | p-valeur = {r['p_value']}")
+
     return {
         'df_emissions':          df_emissions,
         'france_synth':          france_synth,
@@ -297,7 +468,161 @@ def run_scm(df_panel: pd.DataFrame) -> dict:
         'p_value':               p_val,
         'time_permutation':          time_perm,
         'time_permutation_no_covid': time_perm_no_covid,
+        'leave_one_out':             loo,
+        'mspe_sensitivity':          mspe_sensitivity,
         'avg_gap_post':          avg_gap_post,
+    }
+
+
+def run_scm_predictor_augmented(data_by_var: dict, valid_countries: list,
+                                 target_var: str, predictor_vars: list) -> dict:
+    """Variante "SCM augmenté" de run_scm() : les poids W sont ajustés sur la
+    variable cible ET les prédicteurs structurels (get_w_predictor_augmented)
+    au lieu des seuls lags de la variable cible. Reproduit les mêmes tests de
+    robustesse que run_scm() (placebo in-space/in-time, bande MSPE, permutation
+    temporelle + contrôle COVID, leave-one-out, sensibilité au seuil MSPE), sur
+    le même format de résultats pour rester compatible avec plot_results().
+
+    Objectif : tester si le fait d'ancrer les poids sur des variables
+    structurelles (motorisation, mix énergétique, prix carburant), plutôt
+    que sur les seules valeurs pré-traitement de la cible, réduit la
+    dépendance à un seul pays observée avec le SCM outcome-only (run_scm) —
+    l'Allemagne y portait 76.5% du poids et sa seule absence faisait
+    exploser le RMSE pré-traitement (0.018 → 0.149) et changer le signe du
+    gap post-2014.
+    """
+    df_emissions = data_by_var[target_var]
+    control_units = [c for c in valid_countries if c != TREATED_UNIT]
+    print(f"   Pool de contrôle augmenté ({len(control_units)}) : {control_units}")
+    print(f"   Prédicteurs structurels : {predictor_vars}")
+
+    pre_years = df_emissions.index[df_emissions.index < TREATMENT_YEAR]
+
+    # ── France synthétique (vrai traitement) ──
+    weights_fr = get_w_predictor_augmented(
+        data_by_var, TREATED_UNIT, control_units, target_var, predictor_vars, pre_years
+    )
+    france_synth = df_emissions[control_units].values @ weights_fr
+
+    mask_pre = df_emissions.index < TREATMENT_YEAR
+    y_pre_fr = df_emissions.loc[mask_pre, TREATED_UNIT].values
+    X_pre_fr = df_emissions.loc[mask_pre, control_units].values
+    pre_rmse = np.sqrt(np.mean((y_pre_fr - X_pre_fr @ weights_fr) ** 2))
+    print(f"   RMSE pré-traitement France (cible seule, poids augmentés) : {pre_rmse:.4f} log-points")
+    print(f"   Poids W : { {c: round(w, 3) for c, w in zip(control_units, weights_fr)} }")
+
+    # ── Placebo in-space ──
+    placebos_space = {}
+    for unit in valid_countries:
+        donor_pool = [c for c in valid_countries if c != unit]
+        w_p = get_w_predictor_augmented(
+            data_by_var, unit, donor_pool, target_var, predictor_vars, pre_years
+        )
+        unit_synth = df_emissions[donor_pool].values @ w_p
+        placebos_space[unit] = df_emissions[unit].values - unit_synth
+
+    # ── Placebo in-time (faux traitement 2010) ──
+    pre_years_fake = df_emissions.index[df_emissions.index < PLACEBO_YEAR]
+    weights_fake = get_w_predictor_augmented(
+        data_by_var, TREATED_UNIT, control_units, target_var, predictor_vars, pre_years_fake
+    )
+    france_synth_past = df_emissions[control_units].values @ weights_fake
+
+    # ── Filtre MSPE (bande haute ET basse, cf. run_scm) ──
+    mspe_pre_all = {
+        u: calculate_mspe(g, TREATMENT_YEAR, df_emissions.index, 'pre')
+        for u, g in placebos_space.items()
+    }
+    fr_pre_mspe = mspe_pre_all[TREATED_UNIT]
+    upper_bound = fr_pre_mspe * MSPE_THRESHOLD
+    lower_bound = fr_pre_mspe / MSPE_THRESHOLD
+    valid_units = [u for u, e in mspe_pre_all.items() if lower_bound <= e <= upper_bound]
+    excluded_overfit = [u for u, e in mspe_pre_all.items() if e < lower_bound]
+    if excluded_overfit:
+        print(f"   Unités exclues pour pré-fit suspect (sur-ajustement quasi parfait) : "
+              f"{excluded_overfit}")
+
+    ratios = {
+        u: calculate_mspe(placebos_space[u], TREATMENT_YEAR, df_emissions.index, 'post')
+           / mspe_pre_all[u]
+        for u in valid_units
+    }
+    ratios_series = pd.Series(ratios).sort_values()
+    rank = sorted(ratios.values(), reverse=True).index(ratios[TREATED_UNIT]) + 1
+    p_val = rank / len(valid_units)
+    france_gap = pd.Series(
+        df_emissions[TREATED_UNIT].values - france_synth, index=df_emissions.index
+    )
+
+    print(f"\n   Ratio MSPE France : {ratios[TREATED_UNIT]:.2f}")
+    print(f"   Rang France / {len(valid_units)} unités valides → p-valeur empirique (pays) : {p_val:.3f}")
+    avg_gap_post = france_gap[france_gap.index >= TREATMENT_YEAR].mean()
+    print(f"   Gap moyen post-2014 : {avg_gap_post:.3f} log-points (≈ {avg_gap_post * 100:.1f}% d'impact)")
+
+    # ── Permutation temporelle + contrôle COVID ──
+    time_perm = time_permutation_pvalue(france_gap, TREATMENT_YEAR)
+    print(f"   Permutation temporelle : ratio observé = {time_perm['actual_ratio']:.2f} | "
+          f"p-valeur (temps, {time_perm['n_permutations']} permutations) : {time_perm['p_value']:.3f}")
+    time_perm_no_covid = time_permutation_pvalue(
+        france_gap, TREATMENT_YEAR, exclude_years=COVID_EXCLUDED_YEARS
+    )
+    print(f"   Permutation temporelle (sans {COVID_EXCLUDED_YEARS}) : "
+          f"p-valeur : {time_perm_no_covid['p_value']:.3f} "
+          f"({time_perm_no_covid['n_permutations']} permutations)")
+
+    # ── Leave-one-out sur les donneurs à poids non nul ──
+    donors_with_weight = [c for c, w in zip(control_units, weights_fr) if w > 0.01]
+    loo = {}
+    for dropped in donors_with_weight:
+        remaining = [c for c in control_units if c != dropped]
+        w = get_w_predictor_augmented(
+            data_by_var, TREATED_UNIT, remaining, target_var, predictor_vars, pre_years
+        )
+        X_loo = df_emissions.loc[mask_pre, remaining].values
+        pre_rmse_loo = float(np.sqrt(np.mean((y_pre_fr - X_loo @ w) ** 2)))
+        synth_loo = df_emissions[remaining].values @ w
+        gap_loo = pd.Series(
+            df_emissions[TREATED_UNIT].values - synth_loo, index=df_emissions.index
+        )
+        avg_gap_post_loo = float(gap_loo[gap_loo.index >= TREATMENT_YEAR].mean())
+        tp_loo = time_permutation_pvalue(gap_loo, TREATMENT_YEAR)
+        loo[dropped] = {
+            'weights':      {c: round(float(x), 3) for c, x in zip(remaining, w)},
+            'pre_rmse':     pre_rmse_loo,
+            'avg_gap_post': avg_gap_post_loo,
+            'time_p_value': tp_loo['p_value'],
+        }
+    print(f"\n   Leave-one-out (donneurs à poids non nul : {donors_with_weight}) :")
+    for dropped, r in loo.items():
+        print(f"      sans {dropped} : RMSE pré = {r['pre_rmse']:.4f} | "
+              f"gap post moyen = {r['avg_gap_post']:.3f} | "
+              f"p-valeur temps = {r['time_p_value']:.3f} | poids = {r['weights']}")
+
+    # ── Sensibilité au seuil MSPE ──
+    mspe_sensitivity = mspe_threshold_sensitivity(
+        placebos_space, mspe_pre_all, TREATED_UNIT, TREATMENT_YEAR,
+        df_emissions.index, thresholds=(2, 3, 5)
+    )
+    print(f"\n   Sensibilité au seuil MSPE :")
+    for thr, r in mspe_sensitivity.items():
+        print(f"      ×{thr} : {r['n_valid']} unités valides | "
+              f"rang France = {r['rank']} | p-valeur = {r['p_value']}")
+
+    return {
+        'df_emissions':              df_emissions,
+        'france_synth':              france_synth,
+        'france_synth_past':         france_synth_past,
+        'france_gap':                france_gap,
+        'placebos_space':            placebos_space,
+        'valid_units':               valid_units,
+        'ratios_series':             ratios_series,
+        'pre_rmse':                  pre_rmse,
+        'p_value':                   p_val,
+        'time_permutation':          time_perm,
+        'time_permutation_no_covid': time_perm_no_covid,
+        'leave_one_out':             loo,
+        'mspe_sensitivity':          mspe_sensitivity,
+        'avg_gap_post':              avg_gap_post,
     }
 
 
@@ -305,8 +630,14 @@ def run_scm(df_panel: pd.DataFrame) -> dict:
 # 5. VISUALISATION
 # ──────────────────────────────────────────────────────────────────────────────
 
-def plot_results(results: dict) -> None:
-    """Génère et sauvegarde les deux figures SCM dans outputs/figures/."""
+def plot_results(results: dict, suffix: str = "") -> None:
+    """Génère et sauvegarde les deux figures SCM dans outputs/figures/.
+
+    `suffix` (ex. "_predictors") différencie les figures d'une variante
+    d'estimation alternative de celles du run outcome-only par défaut,
+    pour éviter d'écraser les figures du jour si les deux tournent le
+    même jour.
+    """
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     today = date.today().strftime("%Y%m%d")
 
@@ -370,7 +701,7 @@ def plot_results(results: dict) -> None:
     axes[1, 1].set_xlabel("Ratio MSPE (post / pré)")
 
     plt.tight_layout()
-    path_grid = FIGURES_DIR / f"scm_results_{today}.png"
+    path_grid = FIGURES_DIR / f"scm_results{suffix}_{today}.png"
     fig.savefig(path_grid, dpi=150, bbox_inches='tight')
     plt.close(fig)
     print(f"   Figure 1 sauvegardée : {path_grid}")
@@ -400,7 +731,7 @@ def plot_results(results: dict) -> None:
               f"p-valeur (temps, hors COVID) = {results['time_permutation_no_covid']['p_value']:.3f}.",
               fontsize=9, style='italic', color='gray')
 
-    path_gap = FIGURES_DIR / f"scm_gap_{today}.png"
+    path_gap = FIGURES_DIR / f"scm_gap{suffix}_{today}.png"
     fig2.savefig(path_gap, dpi=150, bbox_inches='tight')
     plt.close(fig2)
     print(f"   Figure 2 sauvegardée : {path_gap}")
@@ -421,8 +752,20 @@ def main() -> dict:
     results = run_scm(df_panel)
     plot_results(results)
 
+    print(f"\n{'─'*60}")
+    print("STAGE 3bis — Variante SCM augmenté (prédicteurs structurels)")
+    print(f"{'─'*60}")
+    data_by_var, valid_countries = load_predictor_augmented_data(
+        MASTER_DATASET_PATH, PAYS_CIBLES, TARGET_VAR, PREDICTOR_VARS,
+        TRAIN_START, PANEL_END
+    )
+    results_augmented = run_scm_predictor_augmented(
+        data_by_var, valid_countries, TARGET_VAR, PREDICTOR_VARS
+    )
+    plot_results(results_augmented, suffix="_predictors")
+
     print(f"\n✅ Stage 3 terminé.")
-    return results
+    return {'outcome_only': results, 'predictor_augmented': results_augmented}
 
 
 if __name__ == "__main__":

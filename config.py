@@ -90,6 +90,14 @@ PANEL_END        = 2023   # dernier millésime Eurostat disponible
 # du test temporel ne repose pas seulement sur le creux de mobilité de 2020.
 COVID_EXCLUDED_YEARS = [2020]
 
+# Prédicteurs structurels pour la variante "SCM augmenté" (scm_estimation.
+# run_scm_predictor_augmented) — choisis pour représenter les canaux
+# théoriques de la CCE (motorisation, mix énergétique, prix du carburant)
+# et complets pour la quasi-totalité de PAYS_CIBLES après imputation TimesFM.
+# La Grèce (EL) n'a aucune donnée diesel_price_ht (Weekly Oil Bulletin) et
+# est donc exclue du pool candidat de cette variante uniquement.
+PREDICTOR_VARS = ['road_eqs_carhab', 'nrg_ind_ren', 'diesel_price_ht']
+
 # ─────────────────────────────────────────────
 # PARAMÈTRES SCM
 # ─────────────────────────────────────────────
