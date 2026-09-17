@@ -1,0 +1,273 @@
+geo,variable,action,n_leading,n_trailing,n_interior_interp
+AT,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+AT,diesel_price_ht,forecast arrière TimesFM (1 pt),1,0,0
+AT,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+AT,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+AT,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+AT,road_eqs_carmot,forecast avant TimesFM (2 pt),0,2,0
+AT,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+AT,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+AT,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+AT,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+AT,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+AT,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+AT,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+BE,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+BE,diesel_price_ht,forecast arrière TimesFM (1 pt),1,0,0
+BE,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+BE,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+BE,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+BE,road_eqs_carmot,forecast avant TimesFM (2 pt),0,2,0
+BE,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+BE,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+BE,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+BE,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+BE,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+BE,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+BE,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+BG,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+BG,diesel_price_ht,forecast arrière TimesFM (4 pt),4,0,0
+BG,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+BG,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+BG,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+BG,road_eqs_carmot,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (12 pt),12,2,0
+BG,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+BG,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+BG,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+BG,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+BG,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+BG,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+BG,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+CY,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+CY,diesel_price_ht,forecast arrière TimesFM (1 pt),1,0,0
+CY,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+CY,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+CY,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+CY,road_eqs_carmot,forecast avant TimesFM (2 pt),0,2,0
+CY,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+CY,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+CY,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+CY,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+CY,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+CY,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+CY,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+CZ,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+CZ,diesel_price_ht,forecast arrière TimesFM (1 pt),1,0,0
+CZ,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+CZ,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+CZ,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+CZ,road_eqs_carmot,forecast avant TimesFM (2 pt),0,2,0
+CZ,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+CZ,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+CZ,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+CZ,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+CZ,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+CZ,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+CZ,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+DE,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+DE,diesel_price_ht,forecast arrière TimesFM (1 pt),1,0,0
+DE,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+DE,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+DE,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+DE,road_eqs_carmot,forecast avant TimesFM (2 pt),0,2,0
+DE,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+DE,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+DE,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+DE,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+DE,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+DE,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+DE,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+EE,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+EE,diesel_price_ht,forecast arrière TimesFM (1 pt),1,0,0
+EE,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+EE,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+EE,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+EE,road_eqs_carmot,forecast avant TimesFM (2 pt),0,2,0
+EE,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+EE,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+EE,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+EE,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+EE,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+EE,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+EE,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+EL,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+EL,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+EL,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+EL,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+EL,road_eqs_carmot,ignoré (série entièrement vide),23,0,0
+EL,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+EL,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+EL,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+EL,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+EL,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+EL,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+EL,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+ES,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+ES,diesel_price_ht,forecast arrière TimesFM (1 pt),1,0,0
+ES,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+ES,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+ES,road_eqs_carhab,interpolation linéaire (1 pt) + forecast avant TimesFM (2 pt),0,2,1
+ES,road_eqs_carmot,interpolation linéaire (2 pt) + forecast avant TimesFM (2 pt),0,2,2
+ES,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+ES,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+ES,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+ES,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+ES,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+ES,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+ES,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+FR,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+FR,diesel_price_ht,forecast arrière TimesFM (1 pt),1,0,0
+FR,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+FR,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+FR,road_eqs_carhab,interpolation linéaire (1 pt) + forecast avant TimesFM (2 pt),0,2,1
+FR,road_eqs_carmot,interpolation linéaire (3 pt) + forecast avant TimesFM (2 pt),0,2,3
+FR,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+FR,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+FR,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+FR,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+FR,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+FR,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+FR,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+HR,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+HR,diesel_price_ht,forecast arrière TimesFM (9 pt),9,0,0
+HR,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+HR,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+HR,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+HR,road_eqs_carmot,forecast avant TimesFM (2 pt),0,2,0
+HR,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+HR,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+HR,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+HR,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+HR,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+HR,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+HR,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+HU,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+HU,diesel_price_ht,forecast arrière TimesFM (1 pt),1,0,0
+HU,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+HU,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+HU,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+HU,road_eqs_carmot,forecast avant TimesFM (2 pt),0,2,0
+HU,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+HU,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+HU,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+HU,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+HU,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+HU,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+HU,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+IT,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+IT,diesel_price_ht,forecast arrière TimesFM (1 pt),1,0,0
+IT,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+IT,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+IT,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+IT,road_eqs_carmot,forecast avant TimesFM (2 pt),0,2,0
+IT,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+IT,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+IT,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+IT,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+IT,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+IT,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+IT,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+LT,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+LT,diesel_price_ht,forecast arrière TimesFM (1 pt),1,0,0
+LT,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+LT,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+LT,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+LT,road_eqs_carmot,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (9 pt),9,2,0
+LT,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+LT,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+LT,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+LT,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+LT,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+LT,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+LT,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+LU,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+LU,diesel_price_ht,forecast arrière TimesFM (1 pt),1,0,0
+LU,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+LU,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+LU,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+LU,road_eqs_carmot,forecast avant TimesFM (2 pt),0,2,0
+LU,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+LU,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+LU,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+LU,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+LU,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+LU,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+LU,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+LV,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+LV,diesel_price_ht,forecast arrière TimesFM (1 pt),1,0,0
+LV,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+LV,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+LV,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+LV,road_eqs_carmot,forecast avant TimesFM (2 pt),0,2,0
+LV,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+LV,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+LV,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+LV,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+LV,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+LV,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+LV,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+MT,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+MT,diesel_price_ht,forecast arrière TimesFM (1 pt),1,0,0
+MT,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+MT,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+MT,road_eqs_carhab,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+MT,road_eqs_carmot,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+MT,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+MT,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+MT,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+MT,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+MT,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+MT,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+MT,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+NL,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+NL,diesel_price_ht,forecast arrière TimesFM (1 pt),1,0,0
+NL,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+NL,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+NL,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+NL,road_eqs_carmot,interpolation linéaire (2 pt) + forecast avant TimesFM (2 pt),0,2,2
+NL,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+NL,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+NL,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+NL,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+NL,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+NL,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+NL,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+PL,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+PL,diesel_price_ht,forecast arrière TimesFM (1 pt),1,0,0
+PL,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+PL,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+PL,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+PL,road_eqs_carmot,forecast avant TimesFM (12 pt),0,12,0
+PL,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+PL,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+PL,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+PL,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+PL,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+PL,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+PL,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+RO,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+RO,diesel_price_ht,forecast arrière TimesFM (4 pt),4,0,0
+RO,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+RO,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+RO,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+RO,road_eqs_carmot,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (4 pt),4,2,0
+RO,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+RO,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+RO,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+RO,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+RO,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+RO,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+RO,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0
+SK,demo_r_d3dens,forecast avant TimesFM (2 pt),0,2,0
+SK,diesel_price_ht,forecast arrière TimesFM (1 pt),1,0,0
+SK,env_air_gge,forecast avant TimesFM (3 pt),0,3,0
+SK,nrg_ind_ren,forecast avant TimesFM (2 pt),0,2,0
+SK,road_eqs_carhab,forecast avant TimesFM (2 pt),0,2,0
+SK,road_eqs_carmot,ignoré (série entièrement vide),23,0,0
+SK,sdg_07_11_1,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+SK,sdg_07_11_2,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+SK,sdg_07_11_3,forecast avant TimesFM (2 pt) + forecast arrière TimesFM (1 pt),1,2,0
+SK,sdg_07_30_1,forecast avant TimesFM (2 pt),0,2,0
+SK,sdg_07_30_2,forecast avant TimesFM (2 pt),0,2,0
+SK,sdg_08_10_1,forecast avant TimesFM (2 pt),0,2,0
+SK,sdg_08_10_2,forecast avant TimesFM (2 pt),0,2,0

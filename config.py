@@ -27,8 +27,17 @@ FICHIER_OIL = DATA_OIL_DIR / "Weekly_Oil_Bulletin_Prices_History_maticni_4web.xl
 # CHEMINS — DONNÉES TRAITÉES
 # ─────────────────────────────────────────────
 DATA_PROCESSED_DIR    = PROJECT_ROOT / "Data" / "processed"
+DATA_ARCHIVE_DIR      = DATA_PROCESSED_DIR / "archive"
 MASTER_DATASET_PATH   = DATA_PROCESSED_DIR / "master_dataset_final_scm.csv"
 OPTIMAL_PANEL_PATH    = DATA_PROCESSED_DIR / "optimal_joint_panel.csv"
+IMPUTATION_REPORT_PATH = DATA_PROCESSED_DIR / "imputation_report.csv"
+
+# ─────────────────────────────────────────────
+# STAGE OPTIONNEL — IMPUTATION TIMESFM
+# ─────────────────────────────────────────────
+# Nécessite un environnement dédié (torch + timesfm), incompatible avec le
+# .venv principal — voir scripts/setup_timesfm_env.sh et src/timesfm_imputation.py
+TIMESFM_VENV_PYTHON = PROJECT_ROOT / ".venv-timesfm" / "bin" / "python"
 
 # ─────────────────────────────────────────────
 # CHEMINS — OUTPUTS

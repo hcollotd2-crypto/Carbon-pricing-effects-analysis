@@ -60,29 +60,30 @@ Le donor pool exclut *a priori* les pays ayant une tarification carbone directe 
 
 ## Résultats
 
-Dernière exécution disponible dans `outputs/figures/` :
+Dernière exécution disponible dans `outputs/figures/` (Stage 2 + Stage 3 relancés le 2026-09-17 sur le master dataset complété par le stage d'imputation TimesFM — voir [Architecture du pipeline](#architecture-du-pipeline)) :
 
-![Résultats SCM et tests de robustesse](outputs/figures/scm_results_20260516.png)
-![Effet net (log-gap)](outputs/figures/scm_gap_20260516.png)
+![Résultats SCM et tests de robustesse](outputs/figures/scm_results_20260917.png)
+![Effet net (log-gap)](outputs/figures/scm_gap_20260917.png)
 
 | Indicateur | Valeur observée |
 |---|---|
-| RMSE pré-traitement (France) | 0.0224 log-points |
-| Donor pool final | 7 pays (DE, EL, HR, HU, NL, PL, RO) |
-| Prédicteurs retenus | `road_eqs_carhab`, `sdg_07_11` |
-| Unités valides après filtre MSPE ×3 | 3 (FR, HU, NL) |
-| Ratio MSPE post/pré — France | ≈ 8 |
-| **p-valeur empirique (placebo in-space)** | **1.000** |
+| RMSE pré-traitement (France) | 0.0180 log-points |
+| Donor pool SCM (outcome-only, Stage 3) | DE (0.765), IT (0.194), AT (0.041) |
+| Unités valides après filtre MSPE (bornes ×3 / ÷3) | 8 (pool élargi aux 20 `PAYS_CIBLES`, cf. Stage 3) |
+| Ratio MSPE post/pré — France | 7.73 (médiane des 8 unités valides : 16) |
+| **p-valeur empirique — placebo in-space (pays)** | **0.750** (rang 6/8) |
+| **p-valeur empirique — placebo in-time (permutation temporelle, 18 tirages)** | **0.105** |
+| Gap moyen post-2014 | −0.040 log-points ≈ **−4,0 %** d'émissions GES transport, soit de l'ordre de −5 Mt CO₂eq/an sur la base du niveau moyen observé sur la période (ordre de grandeur, pas un chiffre précis) |
 
-**Lecture honnête du résultat :** le pré-fit est bon (RMSE sous le seuil de 0.05 fixé par le projet) et le graphique brut (France réelle vs synthétique) montre une divergence post-2014 visuellement nette. Mais le test de permutation, qui est le juge de robustesse retenu par ce projet, ne la valide pas : sur les 3 seules unités survivant au filtre MSPE, la France a le ratio MSPE post/pré **le plus faible**, ce qui donne la p-valeur maximale possible (1.000) plutôt qu'un résultat significatif. Voir la section suivante.
+**Lecture honnête du résultat :** le pré-fit reste très bon (RMSE 0.0180, sous le seuil de 0.05) et le graphique brut montre une divergence post-2014 visuellement nette. L'élargissement du pool de contrôle à 20 pays (au lieu de 7) a résolu le plancher mécanique de p-valeur qui affectait la version précédente (p ne pouvait alors prendre que 1/3, 2/3 ou 1, faute d'unités valides) : on dispose maintenant de 8 unités placebo valides, et un test de permutation temporelle complémentaire. Mais sur les deux critères, le résultat **ne franchit pas** le seuil p ≤ 0.10 fixé par le projet : le ratio MSPE de la France (7.73) est proche de la médiane des placebos (16), pas dans sa queue supérieure (p = 0.750) ; le test temporel s'en approche sans le passer (p = 0.105). Voir la section suivante.
 
 ## Limites et mises en garde
 
 Ce projet documente lui-même une hiérarchie de validité stricte (pré-fit → absence de contamination → significativité des placebos). Sur cette base, l'état actuel présente trois limites qui empêchent une conclusion causale robuste :
 
-1. **Puissance statistique insuffisante du test de permutation.** Le filtre MSPE ×3 élimine 4 des 7 pays du donor pool, ne laissant que 3 unités valides. Avec n=3, la p-valeur empirique ne peut prendre que les valeurs 1/3, 2/3 ou 1 — il est structurellement impossible d'atteindre le seuil usuel de p ≤ 0.10, quelle que soit la réalité de l'effet.
-2. **Absence de traitement du choc COVID-19.** Le gap post-2014 rapporté est fortement tiré par l'effondrement de la mobilité en 2020, un choc exogène sans lien avec la CCE. Aucune spécification alternative (sous-périodes, DiD synthétique) n'isole cet effet à ce stade.
-3. **Donor pool et jeu de prédicteurs restreints.** Sur 20 pays et 8 séries Eurostat candidates, seuls 7 pays et 2 prédicteurs de base survivent à la sélection gloutonne — notamment, `diesel_price_ht` (le prix du carburant, canal de transmission direct de la CCE) n'est jamais retenu, probablement du fait d'un critère d'exclusion sur données manquantes très strict.
+1. **Significativité des placebos non atteinte, malgré un pool élargi.** Le plancher mécanique de p-valeur (n=3, p ∈ {1/3, 2/3, 1}) a été résolu en élargissant le pool de contrôle à 20 pays (8 unités valides après filtre MSPE) — mais la p-valeur reste au-dessus de 0.10 sur les deux tests (placebo in-space : 0.750 ; permutation temporelle : 0.105). Ce n'est donc plus une limite de puissance statistique, mais un résultat de fond : le ratio MSPE de la France n'est pas extrême dans la distribution des placebos.
+2. **Absence de traitement du choc COVID-19.** Le gap post-2014 rapporté est fortement tiré par l'effondrement de la mobilité en 2020, un choc exogène sans lien avec la CCE. Le test de permutation temporelle hors 2020 (p = 0.111, ratio 4.74) suggère que ce choc n'est pas seul en cause, mais aucune spécification alternative (sous-périodes, DiD synthétique) n'isole complètement cet effet à ce stade.
+3. **`diesel_price_ht` reste écarté, mais plus par manque de données.** Un stage d'imputation TimesFM (`src/timesfm_imputation.py`, optionnel — voir plus bas) a comblé le trou 2004 qui excluait auparavant `diesel_price_ht` de la sélection du Stage 2 sur toute la fenêtre d'entraînement 2005–2009. La série est désormais éligible, mais n'est toujours pas retenue par la sélection gloutonne (RMSE de validation) — une limite de spécification, pas de disponibilité des données.
 
 **En clair : le graphique de gap seul ne suffit pas à conclure à un effet causal de la CCE sur ce panel.** Voir [Pistes d'évolution](#pistes-dévolution) pour les leviers identifiés afin de renforcer l'inférence.
 
@@ -100,11 +101,18 @@ run_pipeline.py
 │   Algo    : optimisation alternée (moteur A : pays, moteur B : prédicteurs)
 │   Sortie  : Data/processed/optimal_joint_panel.csv
 │
-└── Stage 3 — src/scm_estimation.py
-    Entrée  : Data/processed/optimal_joint_panel.csv
-    Tests   : placebo in-space, placebo in-time (2010), filtre MSPE (×3)
-    Sorties : outputs/figures/scm_results_YYYYMMDD.png
-              outputs/figures/scm_gap_YYYYMMDD.png
+├── Stage 3 — src/scm_estimation.py
+│   Entrée  : Data/processed/optimal_joint_panel.csv
+│   Tests   : placebo in-space, placebo in-time (2010), filtre MSPE (×3)
+│   Sorties : outputs/figures/scm_results_YYYYMMDD.png
+│             outputs/figures/scm_gap_YYYYMMDD.png
+│
+└── Stage optionnel — src/timesfm_imputation.py  (--only impute, entre Stage 1 et 2)
+    Entrée/Sortie : Data/processed/master_dataset_final_scm.csv (écrasé, complété)
+    Remplace le flat-fill des bords utilisé par défaut dans Stages 2/3
+    (pandas interpolate limit_direction='both') par un forecast/backcast
+    TimesFM 2.5 — nécessite l'environnement dédié .venv-timesfm (voir
+    scripts/setup_timesfm_env.sh), incompatible avec le .venv principal.
 ```
 
 Chaque stage peut être relancé indépendamment via `run_pipeline.py` (voir [Utilisation](#utilisation)). Les paramètres structurants sont centralisés dans `config.py` et ne doivent pas être modifiés sans validation (cf. `AGENTS.md`).
@@ -196,8 +204,8 @@ Voir `docs/synthese_technique.md` pour la justification économétrique de chaqu
 
 Par ordre de priorité pour renforcer la robustesse de l'inférence :
 
-1. **Élargir le pool de contrôle** au-delà de l'UE (OCDE : USA, Canada, Australie, Japon, Corée du Sud) pour augmenter le nombre d'unités valides après filtre MSPE — seul levier réel pour sortir du plancher de p-valeur actuel (n=3).
-2. **Assouplir le critère d'exclusion sur données manquantes** dans la sélection des prédicteurs (Stage 2), pour permettre l'inclusion de `diesel_price_ht`, actuellement écarté malgré sa pertinence théorique directe.
+1. ~~Élargir le pool de contrôle~~ **Fait (2026-09-16)** pour les 20 `PAYS_CIBLES` UE (8 unités valides au lieu de 3) — reste à tester au-delà de l'UE (OCDE : USA, Canada, Australie, Japon, Corée du Sud) pour voir si ça déplace le rang de la France dans la distribution des placebos.
+2. ~~Assouplir le critère d'exclusion sur données manquantes~~ **Fait (2026-09-17)** via le stage optionnel d'imputation TimesFM (`src/timesfm_imputation.py`) — `diesel_price_ht` est désormais éligible sur la fenêtre d'entraînement 2005–2009, mais n'est toujours pas retenu par la sélection gloutonne sur critère RMSE.
 3. **Isoler l'effet COVID-19** via une spécification Synthetic Difference-in-Differences ou une lecture séparée 2014–2019 / 2020–2023.
 4. **Comparer à des estimateurs alternatifs** (DiD à deux voies, inférence conforme à la Chernozhukov et al.) pour tester la stabilité du signe et de l'ordre de grandeur hors du cadre SCM strict.
 5. **Étendre l'analyse à d'autres secteurs énergétiques** (résidentiel, industrie) couverts par la CCE, moins exposés au confondant de mobilité COVID que le transport seul.

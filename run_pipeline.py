@@ -11,13 +11,23 @@ Orchestre les 3 stages du projet dans l'ordre :
                                     → outputs/figures/scm_results_YYYYMMDD.png
                                     → outputs/figures/scm_gap_YYYYMMDD.png
 
+Stage optionnel — timesfm_imputation.py : complète les trous du master dataset
+  (Stage 1) par forecast/backcast TimesFM au lieu du flat-fill par défaut des
+  Stages 2/3. N'est PAS inclus dans un run complet (télécharge un modèle de
+  ~800 Mo et tourne dans un environnement dédié — voir
+  scripts/setup_timesfm_env.sh) : à lancer explicitement via --only impute,
+  entre le Stage 1 et le Stage 2.
+
 Usage :
-  python run_pipeline.py                  # pipeline complet
+  python run_pipeline.py                  # pipeline complet (stages 1-3)
   python run_pipeline.py --from stage2    # depuis le Stage 2 (données déjà générées)
   python run_pipeline.py --from stage3    # depuis le Stage 3 (panel déjà sélectionné)
   python run_pipeline.py --only stage3    # Stage 3 uniquement
+  python run_pipeline.py --only impute    # imputation TimesFM du master dataset
 """
 
+import os
+import subprocess
 import sys
 import time
 import argparse
@@ -36,8 +46,8 @@ def parse_args():
     )
     group.add_argument(
         '--only', dest='only_stage',
-        choices=['stage1', 'stage2', 'stage3'],
-        help="Exécuter un seul stage"
+        choices=['stage1', 'impute', 'stage2', 'stage3'],
+        help="Exécuter un seul stage ('impute' : imputation TimesFM, optionnelle)"
     )
     return parser.parse_args()
 
@@ -54,6 +64,24 @@ def run_stage(label: str, fn):
     except Exception as e:
         print(f"\n❌ Erreur dans {label} : {e}")
         raise
+
+
+def run_impute_stage():
+    """Lance src/timesfm_imputation.py dans son environnement dédié (subprocess),
+    car torch/timesfm sont incompatibles avec le .venv principal du pipeline
+    (voir scripts/setup_timesfm_env.sh).
+    """
+    from config import TIMESFM_VENV_PYTHON, PROJECT_ROOT
+
+    if not TIMESFM_VENV_PYTHON.exists():
+        raise FileNotFoundError(
+            f"Environnement TimesFM introuvable ({TIMESFM_VENV_PYTHON}).\n"
+            f"   Crée-le avec : bash scripts/setup_timesfm_env.sh"
+        )
+
+    script_path = PROJECT_ROOT / "src" / "timesfm_imputation.py"
+    env = {**os.environ, "PYTHONPATH": str(PROJECT_ROOT)}
+    subprocess.run([str(TIMESFM_VENV_PYTHON), str(script_path)], check=True, env=env)
 
 
 def main():
@@ -82,6 +110,9 @@ def main():
     if 'stage1' in stages_to_run:
         from src import data_pipeline
         run_stage("Stage 1 — Data Pipeline", data_pipeline.main)
+
+    if 'impute' in stages_to_run:
+        run_stage("Stage optionnel — Imputation TimesFM", run_impute_stage)
 
     if 'stage2' in stages_to_run:
         from src import donor_selection

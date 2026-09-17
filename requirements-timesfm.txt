@@ -1,0 +1,16 @@
+# Dépendances du stage optionnel d'imputation TimesFM (src/timesfm_imputation.py)
+# Environnement SÉPARÉ du .venv principal — voir scripts/setup_timesfm_env.sh
+# Installer avec :
+#   python3.11 -m venv .venv-timesfm
+#   .venv-timesfm/bin/pip install -r requirements-timesfm.txt
+#
+# torch==2.2.2 : dernier wheel publié pour macOS x86_64 (Intel) — sur Apple
+# Silicon/Linux, une version plus récente (ex: torch>=2.2) est utilisable et
+# évite le contournement _safe_sdpa documenté dans src/timesfm_imputation.py.
+# numpy<2 : imposé par torch 2.2.2, incompatible avec le reste du pipeline
+# (d'où l'environnement séparé plutôt qu'un ajout à requirements.txt).
+
+timesfm[torch]==3.0.2
+torch==2.2.2
+numpy<2
+pandas>=1.5.0

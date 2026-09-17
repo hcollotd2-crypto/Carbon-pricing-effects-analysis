@@ -113,9 +113,9 @@ Suède (1991), Finlande (1990), Norvège (1991), Danemark (1992), Suisse (2008),
 
 *À compléter après chaque exécution du pipeline.*
 
-| Date | RMSE pré | Gap moyen post-2014 | Ratio MSPE FR | p-valeur | Donor pool |
-|---|---|---|---|---|---|
-| — | — | — | — | — | — |
+| Date | RMSE pré | Gap moyen post-2014 | Ratio MSPE FR | p-valeur (pays) | p-valeur (temps) | Donor pool (Stage 3, outcome-only) |
+|---|---|---|---|---|---|---|
+| 2026-09-17 | 0.0180 | −0.040 log-pts (≈ −4,0 %) | 7.73 (médiane placebos : 16) | 0.750 (rang 6/8) | 0.105 (18 tirages) | DE (0.765), IT (0.194), AT (0.041) — master dataset complété par imputation TimesFM |
 
 ---
 
