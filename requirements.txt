@@ -7,3 +7,4 @@ numpy>=1.23.0
 scipy>=1.9.0
 matplotlib>=3.6.0
 openpyxl>=3.0.10    # lecture fichier Excel (Weekly Oil Bulletin)
+unfccc-di-api>=4.0.4    # extension OCDE hors UE (src/oecd_extension.py)

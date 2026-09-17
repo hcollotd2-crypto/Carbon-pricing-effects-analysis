@@ -30,12 +30,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import date
+from pathlib import Path
 from scipy.optimize import minimize
 
 from config import (
     TREATED_UNIT, TARGET_VAR, TREATMENT_YEAR, PLACEBO_YEAR,
     TRAIN_START, TRAIN_END, PANEL_END, MSPE_THRESHOLD, COVID_EXCLUDED_YEARS,
-    PAYS_CIBLES, MASTER_DATASET_PATH, FIGURES_DIR, PREDICTOR_VARS
+    PAYS_CIBLES, MASTER_DATASET_PATH, FIGURES_DIR, PREDICTOR_VARS, OECD_EXTRA_PATH
 )
 
 
@@ -68,15 +69,29 @@ def load_panel(filepath) -> pd.DataFrame:
 
 
 def load_target_panel_full_pool(filepath, pays_cibles: list, target_var: str,
-                                 year_start: int, year_end: int) -> pd.DataFrame:
+                                 year_start: int, year_end: int,
+                                 extra_pays_filepath=None) -> pd.DataFrame:
     """Charge TARGET_VAR pour tous les candidats PAYS_CIBLES depuis le master
     dataset (SCM outcome-only), borné à [year_start, year_end], interpolé
     par pays puis transformé en log. Indépendant de la sélection du Stage 2.
+
+    `extra_pays_filepath` (ex. OECD_EXTRA_PATH) fusionne des pays candidats
+    supplémentaires au même format wide (geo, variable, années) — utilisé
+    pour l'extension OCDE hors UE (src/oecd_extension.py). Les années
+    manquantes pour ces pays (ex. 2022-2023, absentes du snapshot UNFCCC)
+    sont comblées par la même interpolation de bord que le reste du panel,
+    pas par une observation réelle.
     """
     df_raw = pd.read_csv(filepath)
     df_target = df_raw[
         (df_raw['variable'] == target_var) & (df_raw['geo'].isin(pays_cibles))
     ].copy()
+
+    if extra_pays_filepath is not None and Path(extra_pays_filepath).exists():
+        df_extra = pd.read_csv(extra_pays_filepath)
+        df_extra = df_extra[df_extra['variable'] == target_var]
+        df_target = pd.concat([df_target, df_extra], ignore_index=True)
+        pays_cibles = pays_cibles + df_extra['geo'].tolist()
 
     year_cols = [c for c in df_target.columns
                  if str(c).isdigit() and year_start <= int(c) <= year_end]
@@ -747,7 +762,8 @@ def main() -> dict:
     print(f"{'='*60}")
 
     df_panel = load_target_panel_full_pool(
-        MASTER_DATASET_PATH, PAYS_CIBLES, TARGET_VAR, TRAIN_START, PANEL_END
+        MASTER_DATASET_PATH, PAYS_CIBLES, TARGET_VAR, TRAIN_START, PANEL_END,
+        extra_pays_filepath=OECD_EXTRA_PATH
     )
     results = run_scm(df_panel)
     plot_results(results)

@@ -19,9 +19,16 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 DATA_RAW_DIR       = PROJECT_ROOT / "Data" / "raw"
 DATA_EUROSTAT_DIR  = DATA_RAW_DIR / "eurostat"
 DATA_OIL_DIR       = DATA_RAW_DIR / "oil"
+DATA_UNFCCC_DIR    = DATA_RAW_DIR / "unfccc"
 
 FICHIER_OIL = DATA_OIL_DIR / "Weekly_Oil_Bulletin_Prices_History_maticni_4web.xlsx"
 # FICHIER_OCDE = DATA_EUROSTAT_DIR / "OECD_gdp_per_capita.csv"  # décommenter si réactivé
+
+# Extension OCDE hors UE (src/oecd_extension.py) — émissions transport
+# (env_air_gge) pour des pays à risque carbone faible sur 2005-2023,
+# cf. classification documentée dans le README. Snapshot mis en cache,
+# pas un appel réseau à chaque exécution.
+OECD_EXTRA_PATH = DATA_UNFCCC_DIR / "transport_ghg_non_eu.csv"
 
 # ─────────────────────────────────────────────
 # CHEMINS — DONNÉES TRAITÉES
